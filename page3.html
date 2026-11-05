@@ -61,8 +61,10 @@ body{background:var(--canvas);color:var(--ink);font-family:var(--font);font-size
 .placeholder b{font-size:1rem}
 .canvas img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#1c2430;pointer-events:none;-webkit-user-drag:none}
 .slogan{position:absolute;left:8%;right:0;bottom:10%;padding:24px 34px;color:#fff;text-align:left;font-size:clamp(1.6rem, 1.2rem + 1.9vw, 2.7rem);font-weight:700;line-height:1.25;text-wrap:balance}
-.before .slogan{background:rgba(18,35,59,.74)}
-.after .slogan{background:rgba(0,74,158,.8)}
+.before .slogan{background:rgba(18,35,59,.4)}
+.after .slogan{background:rgba(0,74,158,.42)}
+.slogan.high{bottom:auto;top:5%}
+.slogan{display:flex;align-items:center;text-shadow:0 1px 3px rgba(0,0,0,.75),0 0 10px rgba(0,0,0,.45)}
 .initial{color:var(--initial);font-size:1.5em;font-weight:700;line-height:1}
 .handle{position:absolute;top:0;bottom:0;left:var(--at);width:3px;margin-left:-1.5px;background:#fff;pointer-events:none}
 .handle::after{
@@ -140,17 +142,17 @@ const PAGE = {
      Each side names its painting and the image file that goes beside this page. */
   spelling: [
     { letter: "F", topic: "Lectures",
-      before: "\u201CWisdom\u201D delivered from the front", beforeArt: "Laurentius de Voltolina, Henricus de Alemannia Lecturing", beforeFile: "lectures-common.jpg",
-      after: "Faculty who move minds", afterArt: "Joseph Wright of Derby, A Philosopher Lecturing on the Orrery", afterFile: "lectures-fred.jpg" },
+      before: "\u201CWisdom\u201D delivered from the front", beforeArt: "Laurentius de Voltolina, Henricus de Alemannia Lecturing", beforeFile: "lectures-common.jpg", beforeFit: "cover 50% 18%",
+      after: "Faculty who move minds", afterArt: "Michael Ancher, Fishermen Launching a Rowing Boat", afterFile: "lectures-fred.jpg", afterFit: "cover 50% 16%" },
     { letter: "r", topic: "Assignments",
-      before: "Cases detached from real work", beforeArt: "Carl Spitzweg, The Bookworm", beforeFile: "assignments-common.jpg",
-      after: "Real, ongoing challenge as your case", afterArt: "Pieter Bruegel the Elder, The Harvesters", afterFile: "assignments-fred.jpg" },
+      before: "Cases detached from real work", beforeArt: "Carl Spitzweg, The Bookworm", beforeFile: "assignments-common.jpg", beforeFit: "contain",
+      after: "Real, ongoing challenge as your case", afterArt: "Winslow Homer, Eight Bells", afterFile: "assignments-fred.jpg", afterFit: "cover 50% 72%" },
     { letter: "E", topic: "Learning process",
-      before: "A parade of concepts and tools", beforeArt: "Pieter Bruegel the Elder, The Fight Between Carnival and Lent", beforeFile: "process-common.jpg",
-      after: "Every step adds up to one transformational journey", afterArt: "Pieter Bruegel the Elder, The Tower of Babel", afterFile: "process-fred.jpg" },
+      before: "A parade of concepts and tools", beforeArt: "Pieter Bruegel the Elder, Children\u2019s Games", beforeFile: "process-common.jpg", beforeFit: "cover 50% 45%",
+      after: "Every step adds up to one transformational journey", afterArt: "Pieter Bruegel the Elder, The Tower of Babel", afterFile: "process-fred.jpg", afterFit: "cover 50% 8%" },
     { letter: "D", topic: "Coaching",
-      before: "General, challenging questions", beforeArt: "Hieronymus Bosch or follower, The Conjurer", beforeFile: "coaching-common.jpg",
-      after: "Detailed understanding of your problem", afterArt: "Sofonisba Anguissola, Bernardino Campi Painting Sofonisba Anguissola", afterFile: "coaching-fred.jpg" }
+      before: "General, challenging questions", beforeArt: "Hieronymus Bosch or follower, The Conjurer", beforeFile: "coaching-common.jpg", beforeFit: "cover 50% 22%",
+      after: "Detailed understanding of your problem", afterArt: "Sofonisba Anguissola, Bernardino Campi Painting Sofonisba Anguissola", afterFile: "coaching-fred.jpg", afterFit: "contain" }
   ],
   closing: [
     { topic: "Impact",
@@ -170,7 +172,7 @@ const PAGE = {
     el.textContent = text;
     return el;
   }
-  function layer(kind, topic, label, text, art, file, marked, fit){
+  function layer(kind, topic, label, text, art, file, marked, fit, band){
     const el = document.createElement("div");
     el.className = "layer " + kind;
     const frameLabel = document.createElement("div");
@@ -187,19 +189,25 @@ const PAGE = {
     canvas.appendChild(hold);
     const img = new Image();
     img.alt = art;
-    if (fit) img.style.objectFit = fit;
+    if (fit){
+      const [mode, ...pos] = fit.split(" ");
+      img.style.objectFit = mode;
+      if (pos.length) img.style.objectPosition = pos.join(" ");
+    }
     img.draggable = false;
     img.addEventListener("error", () => img.remove());
     img.src = file;
     canvas.appendChild(img);
     const slogan = document.createElement("div");
-    slogan.className = "slogan";
+    slogan.className = "slogan" + (band ? " " + band : "");
+    const words = document.createElement("span");
     if (marked){
-      slogan.appendChild(Object.assign(textNode("span", text.charAt(0)), { className: "initial" }));
-      slogan.appendChild(document.createTextNode(text.slice(1)));
+      words.appendChild(Object.assign(textNode("span", text.charAt(0)), { className: "initial" }));
+      words.appendChild(document.createTextNode(text.slice(1)));
     } else {
-      slogan.textContent = text;
+      words.textContent = text;
     }
+    slogan.appendChild(words);
     canvas.appendChild(slogan);
     el.appendChild(canvas);
     return el;
@@ -213,7 +221,7 @@ const PAGE = {
     box.setAttribute("aria-valuemin", "0");
     box.setAttribute("aria-valuemax", "100");
     box.appendChild(layer("before", item.topic, PAGE.labels.before, item.before, item.beforeArt, item.beforeFile, false, item.beforeFit));
-    box.appendChild(layer("after", item.topic, PAGE.labels.after, item.after, item.afterArt, item.afterFile, !!letterBox));
+    box.appendChild(layer("after", item.topic, PAGE.labels.after, item.after, item.afterArt, item.afterFile, !!letterBox, item.afterFit, item.afterBand));
     const handle = document.createElement("div");
     handle.className = "handle";
     box.appendChild(handle);
@@ -258,6 +266,16 @@ const PAGE = {
   });
   const closing = document.getElementById("closing");
   PAGE.closing.forEach(item => closing.appendChild(makeSlider(item, null)));
+  /* every band takes the height of the tallest one */
+  function evenBands(){
+    const bands = [...document.querySelectorAll(".slogan")];
+    bands.forEach(b => { b.style.minHeight = ""; });
+    const tallest = Math.max(...bands.map(b => b.offsetHeight));
+    bands.forEach(b => { b.style.minHeight = tallest + "px"; });
+  }
+  evenBands();
+  window.addEventListener("resize", evenBands);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(evenBands);
   const all = PAGE.spelling.concat(PAGE.closing);
   document.getElementById("credits").textContent =
     "Paintings: " + all.map(i => i.beforeArt + "; " + i.afterArt).join("; ");

@@ -95,6 +95,13 @@ body{background:var(--canvas);color:var(--ink);font-family:var(--font);font-size
 
 /* ---------- page buttons ---------- */
 .credits{margin:0;font-size:.7rem;color:#6b7c92;text-align:center}
+.slider.words{height:142px}
+.words .layer{display:grid;align-content:center;justify-items:center;gap:4px;padding:10px 64px;text-align:center}
+.words .before{background:var(--before);color:var(--ink)}
+.words .label{padding:0}
+.words strong{font-size:clamp(1.15rem, 1rem + .8vw, 1.5rem);font-weight:600;line-height:1.25;text-wrap:balance}
+.btn-primary{background:var(--lac-leman);color:#fff}
+.btn-primary:hover{background:var(--lac-leman-dark)}
 .nav{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;margin-top:8px}
 .btn{font:inherit;border-radius:8px;border:1px solid transparent;padding:10px 18px;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
 .btn:focus-visible{outline:3px solid #7fb2ee;outline-offset:2px}
@@ -104,6 +111,8 @@ body{background:var(--canvas);color:var(--ink);font-family:var(--font);font-size
 @media (max-width:640px){
   .slider{height:340px}
   .layer{padding:0 8px 8px}
+  .slider.words{height:176px}
+  .words .layer{padding:10px 34px}
   .placeholder{padding:12px 26px}
   .slogan{left:4%;bottom:6%;padding:14px 16px}
 }
@@ -126,6 +135,7 @@ body{background:var(--canvas);color:var(--ink);font-family:var(--font);font-size
 
   <nav class="nav" aria-label="Pages">
     <a class="btn btn-ghost" href="page2.html">Back to page 2</a>
+    <a class="btn btn-primary" href="page4.html">Go to page 4</a>
   </nav>
   <p class="credits" id="credits"></p>
 
@@ -142,17 +152,17 @@ const PAGE = {
      Each side names its painting and the image file that goes beside this page. */
   spelling: [
     { letter: "F", topic: "Lectures",
-      before: "\u201CWisdom\u201D delivered from the front", beforeArt: "Laurentius de Voltolina, Henricus de Alemannia Lecturing", beforeFile: "lectures-common.jpg", beforeFit: "cover 50% 18%",
-      after: "Faculty who move minds", afterArt: "Michael Ancher, Fishermen Launching a Rowing Boat", afterFile: "lectures-fred.jpg", afterFit: "cover 50% 16%" },
+      before: "\u201CWisdom\u201D delivered from the front",
+      after: "Faculty who move minds" },
     { letter: "r", topic: "Assignments",
-      before: "Cases detached from real work", beforeArt: "Carl Spitzweg, The Bookworm", beforeFile: "assignments-common.jpg", beforeFit: "contain",
-      after: "Real, ongoing challenge as your case", afterArt: "Winslow Homer, Eight Bells", afterFile: "assignments-fred.jpg", afterFit: "cover 50% 72%" },
+      before: "Cases detached from real work",
+      after: "Real, ongoing challenge as your case" },
     { letter: "E", topic: "Learning process",
-      before: "A parade of concepts and tools", beforeArt: "Pieter Bruegel the Elder, Children\u2019s Games", beforeFile: "process-common.jpg", beforeFit: "cover 50% 45%",
-      after: "Every step adds up to one transformational journey", afterArt: "Pieter Bruegel the Elder, The Tower of Babel", afterFile: "process-fred.jpg", afterFit: "cover 50% 8%" },
+      before: "A parade of concepts and tools",
+      after: "Every step adds up to one transformational journey" },
     { letter: "D", topic: "Coaching",
-      before: "General, challenging questions", beforeArt: "Hieronymus Bosch or follower, The Conjurer", beforeFile: "coaching-common.jpg", beforeFit: "cover 50% 22%",
-      after: "Detailed understanding of your problem", afterArt: "Sofonisba Anguissola, Bernardino Campi Painting Sofonisba Anguissola", afterFile: "coaching-fred.jpg", afterFit: "contain" }
+      before: "General, challenging questions",
+      after: "Detailed understanding of your problem" }
   ],
   closing: [
     { topic: "Impact",
@@ -212,6 +222,24 @@ const PAGE = {
     el.appendChild(canvas);
     return el;
   }
+  function wordLayer(kind, topic, label, text, marked){
+    const el = document.createElement("div");
+    el.className = "layer " + kind;
+    const frameLabel = document.createElement("div");
+    frameLabel.className = "label";
+    frameLabel.appendChild(Object.assign(textNode("span", topic), { className: "topic" }));
+    frameLabel.appendChild(document.createTextNode(label));
+    el.appendChild(frameLabel);
+    const words = document.createElement("strong");
+    if (marked){
+      words.appendChild(Object.assign(textNode("span", text.charAt(0)), { className: "initial" }));
+      words.appendChild(document.createTextNode(text.slice(1)));
+    } else {
+      words.textContent = text;
+    }
+    el.appendChild(words);
+    return el;
+  }
   function makeSlider(item, letterBox){
     const box = document.createElement("div");
     box.className = "slider";
@@ -220,8 +248,14 @@ const PAGE = {
     box.setAttribute("aria-label", item.before + ", compared with " + item.after);
     box.setAttribute("aria-valuemin", "0");
     box.setAttribute("aria-valuemax", "100");
-    box.appendChild(layer("before", item.topic, PAGE.labels.before, item.before, item.beforeArt, item.beforeFile, false, item.beforeFit));
-    box.appendChild(layer("after", item.topic, PAGE.labels.after, item.after, item.afterArt, item.afterFile, !!letterBox, item.afterFit, item.afterBand));
+    if (item.beforeFile){
+      box.appendChild(layer("before", item.topic, PAGE.labels.before, item.before, item.beforeArt, item.beforeFile, false, item.beforeFit));
+      box.appendChild(layer("after", item.topic, PAGE.labels.after, item.after, item.afterArt, item.afterFile, !!letterBox, item.afterFit, item.afterBand));
+    } else {
+      box.classList.add("words");
+      box.appendChild(wordLayer("before", item.topic, PAGE.labels.before, item.before, false));
+      box.appendChild(wordLayer("after", item.topic, PAGE.labels.after, item.after, !!letterBox));
+    }
     const handle = document.createElement("div");
     handle.className = "handle";
     box.appendChild(handle);
@@ -278,7 +312,7 @@ const PAGE = {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(evenBands);
   const all = PAGE.spelling.concat(PAGE.closing);
   document.getElementById("credits").textContent =
-    "Paintings: " + all.map(i => i.beforeArt + "; " + i.afterArt).join("; ");
+    "Paintings: " + all.filter(i => i.beforeArt).map(i => i.beforeArt + "; " + i.afterArt).join("; ");
 })();
 </script>
 </body>

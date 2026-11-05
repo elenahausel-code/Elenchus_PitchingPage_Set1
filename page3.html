@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picasso and Strategic Leadership: Page 3</title>
+<style>
+/* Layout: before/after sliders built from framed paintings. The frame carries the
+   label, gray for common programs and blue for FrED. Revealing four spells FrED. */
+:root{
+  --lac-leman:#005DC4;
+  --lac-leman-dark:#004a9e;
+  --ink:#12233B;
+  --ink-soft:#4a5c74;
+  --paper:#ffffff;
+  --canvas:#f3f7fc;
+  --line:#d3dfec;
+  --before:#E0E1DB;
+  --initial:#F9EBC0;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(0,32,80,.10), 0 6px 18px rgba(0,32,80,.07);
+  --font:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--canvas);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding-block:28px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:grid;
+  gap:18px;
+}
+.wrap > *{min-width:0}
+.line{margin:0;font-size:clamp(1.5rem, 1.15rem + 1.5vw, 2.1rem);font-weight:600;line-height:1.3;letter-spacing:-.005em;text-wrap:balance}
+.instruction{margin:0;font-size:.85rem;color:var(--ink-soft)}
+
+/* ---------- sliders ---------- */
+.sliders{display:grid;gap:18px;justify-self:center;width:100%;max-width:940px}
+.slider{
+  position:relative;
+  height:clamp(300px, 42vw, 470px);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  cursor:ew-resize;
+  touch-action:pan-y;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.slider:focus-visible{outline:3px solid #7fb2ee;outline-offset:2px}
+.layer{position:absolute;inset:0;display:flex;flex-direction:column;padding:0 14px 14px}
+.before{background:#7d8894;color:#fff}
+.after{background:var(--lac-leman);color:#fff;clip-path:inset(0 0 0 var(--at))}
+.label{flex:0 0 auto;padding:9px 6px;text-align:center;font-size:.85rem;font-weight:600;line-height:1.25}
+.topic{font-size:1.35rem;font-weight:700;line-height:1.2}
+.canvas{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;background:#dfe5ec}
+.placeholder{position:absolute;inset:0;display:grid;align-content:start;justify-items:center;gap:2px;padding:18px 90px;text-align:center;color:var(--ink);font-size:.85rem}
+.placeholder b{font-size:1rem}
+.canvas img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#1c2430;pointer-events:none;-webkit-user-drag:none}
+.slogan{position:absolute;left:8%;right:0;bottom:10%;padding:24px 34px;color:#fff;text-align:left;font-size:clamp(1.6rem, 1.2rem + 1.9vw, 2.7rem);font-weight:700;line-height:1.25;text-wrap:balance}
+.before .slogan{background:rgba(18,35,59,.74)}
+.after .slogan{background:rgba(0,74,158,.8)}
+.initial{color:var(--initial);font-size:1.5em;font-weight:700;line-height:1}
+.handle{position:absolute;top:0;bottom:0;left:var(--at);width:3px;margin-left:-1.5px;background:#fff;pointer-events:none}
+.handle::after{
+  content:"\2039\00a0\203A";
+  position:absolute;top:50%;left:50%;
+  width:40px;height:40px;margin:-20px 0 0 -20px;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--lac-leman);border-radius:50%;
+  background:#fff;color:var(--lac-leman);font-size:1.1rem;font-weight:700;line-height:1;
+  box-shadow:0 2px 6px rgba(0,32,80,.25);
+}
+
+/* ---------- the word ---------- */
+.word{display:flex;justify-content:center;gap:10px;padding-block:8px}
+.letter{
+  width:clamp(58px, 12vw, 92px);
+  aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+  border:2px dashed #8fb3dd;
+  border-radius:var(--radius);
+  background:#fafcfe;
+  color:transparent;
+  font-size:clamp(2rem, 1.2rem + 4vw, 3.4rem);
+  font-weight:700;
+  transition:background .25s,color .25s,border-color .25s;
+}
+.letter.on{border:2px solid var(--lac-leman);background:var(--lac-leman);color:#fff}
+
+/* ---------- page buttons ---------- */
+.credits{margin:0;font-size:.7rem;color:#6b7c92;text-align:center}
+.nav{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;margin-top:8px}
+.btn{font:inherit;border-radius:8px;border:1px solid transparent;padding:10px 18px;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
+.btn:focus-visible{outline:3px solid #7fb2ee;outline-offset:2px}
+.btn-ghost{background:var(--paper);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--lac-leman);color:var(--lac-leman)}
+
+@media (max-width:640px){
+  .slider{height:340px}
+  .layer{padding:0 8px 8px}
+  .placeholder{padding:12px 26px}
+  .slogan{left:4%;bottom:6%;padding:14px 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .letter,.btn{transition:none}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <h1 class="line">What makes the FrED strategic leadership program unique?</h1>
+  <p class="instruction">Drag each slider to the left to see the difference.</p>
+
+  <div class="sliders" id="spelling"></div>
+
+  <div class="word" id="word" role="img" aria-label="The word FrED, one letter for each slider revealed"></div>
+
+  <div class="sliders" id="closing"></div>
+
+  <nav class="nav" aria-label="Pages">
+    <a class="btn btn-ghost" href="page2.html">Back to page 2</a>
+  </nav>
+  <p class="credits" id="credits"></p>
+
+</main>
+
+<script>
+/* ================================================================
+   CONFIGURATION: everything editable lives in this block.
+   ================================================================ */
+const PAGE = {
+  labels: { before: " in common strategic leadership programs", after: " in the FrED strategic leadership program" },
+
+  /* The first four spell FrED. "letter" is shown in the word below them.
+     Each side names its painting and the image file that goes beside this page. */
+  spelling: [
+    { letter: "F", topic: "Lectures",
+      before: "\u201CWisdom\u201D delivered from the front", beforeArt: "Laurentius de Voltolina, Henricus de Alemannia Lecturing", beforeFile: "lectures-common.jpg",
+      after: "Faculty who move minds", afterArt: "Joseph Wright of Derby, A Philosopher Lecturing on the Orrery", afterFile: "lectures-fred.jpg" },
+    { letter: "r", topic: "Assignments",
+      before: "Cases detached from real work", beforeArt: "Carl Spitzweg, The Bookworm", beforeFile: "assignments-common.jpg",
+      after: "Real, ongoing challenge as your case", afterArt: "Pieter Bruegel the Elder, The Harvesters", afterFile: "assignments-fred.jpg" },
+    { letter: "E", topic: "Learning process",
+      before: "A parade of concepts and tools", beforeArt: "Pieter Bruegel the Elder, The Fight Between Carnival and Lent", beforeFile: "process-common.jpg",
+      after: "Every step adds up to one transformational journey", afterArt: "Pieter Bruegel the Elder, The Tower of Babel", afterFile: "process-fred.jpg" },
+    { letter: "D", topic: "Coaching",
+      before: "General, challenging questions", beforeArt: "Hieronymus Bosch or follower, The Conjurer", beforeFile: "coaching-common.jpg",
+      after: "Detailed understanding of your problem", afterArt: "Sofonisba Anguissola, Bernardino Campi Painting Sofonisba Anguissola", afterFile: "coaching-fred.jpg" }
+  ],
+  closing: [
+    { topic: "Impact",
+      before: "Individual business acumen", beforeArt: "Pavel Fedotov, An Aristocrat\u2019s Breakfast", beforeFile: "impact-common.jpg", beforeFit: "contain",
+      after: "Organizational intelligence", afterArt: "Ernest Meissonier, 1807, Friedland", afterFile: "impact-fred.jpg" }
+  ],
+
+  startAt: 90,   /* where each divider starts, % from the left */
+  revealAt: 45   /* the letter appears once the divider passes this point */
+};
+
+(function(){
+  const word = document.getElementById("word");
+
+  function textNode(tag, text){
+    const el = document.createElement(tag);
+    el.textContent = text;
+    return el;
+  }
+  function layer(kind, topic, label, text, art, file, marked, fit){
+    const el = document.createElement("div");
+    el.className = "layer " + kind;
+    const frameLabel = document.createElement("div");
+    frameLabel.className = "label";
+    frameLabel.appendChild(Object.assign(textNode("span", topic), { className: "topic" }));
+    frameLabel.appendChild(document.createTextNode(label));
+    el.appendChild(frameLabel);
+    const canvas = document.createElement("div");
+    canvas.className = "canvas";
+    const hold = document.createElement("div");
+    hold.className = "placeholder";
+    hold.appendChild(textNode("b", art));
+    hold.appendChild(textNode("span", "Add the file: " + file));
+    canvas.appendChild(hold);
+    const img = new Image();
+    img.alt = art;
+    if (fit) img.style.objectFit = fit;
+    img.draggable = false;
+    img.addEventListener("error", () => img.remove());
+    img.src = file;
+    canvas.appendChild(img);
+    const slogan = document.createElement("div");
+    slogan.className = "slogan";
+    if (marked){
+      slogan.appendChild(Object.assign(textNode("span", text.charAt(0)), { className: "initial" }));
+      slogan.appendChild(document.createTextNode(text.slice(1)));
+    } else {
+      slogan.textContent = text;
+    }
+    canvas.appendChild(slogan);
+    el.appendChild(canvas);
+    return el;
+  }
+  function makeSlider(item, letterBox){
+    const box = document.createElement("div");
+    box.className = "slider";
+    box.tabIndex = 0;
+    box.setAttribute("role", "slider");
+    box.setAttribute("aria-label", item.before + ", compared with " + item.after);
+    box.setAttribute("aria-valuemin", "0");
+    box.setAttribute("aria-valuemax", "100");
+    box.appendChild(layer("before", item.topic, PAGE.labels.before, item.before, item.beforeArt, item.beforeFile, false, item.beforeFit));
+    box.appendChild(layer("after", item.topic, PAGE.labels.after, item.after, item.afterArt, item.afterFile, !!letterBox));
+    const handle = document.createElement("div");
+    handle.className = "handle";
+    box.appendChild(handle);
+
+    function set(v){
+      v = Math.max(0, Math.min(100, v));
+      box.style.setProperty("--at", v + "%");
+      box.setAttribute("aria-valuenow", Math.round(100 - v));
+      if (letterBox && v <= PAGE.revealAt){
+        letterBox.classList.add("on");
+        letterBox.setAttribute("aria-hidden", "false");
+      }
+    }
+    function fromPointer(e){
+      const r = box.getBoundingClientRect();
+      set((e.clientX - r.left) / r.width * 100);
+    }
+    let held = false;
+    box.addEventListener("pointerdown", e => {
+      held = true;
+      try { box.setPointerCapture(e.pointerId); } catch (err) {}
+      fromPointer(e);
+    });
+    box.addEventListener("pointermove", e => { if (held) fromPointer(e); });
+    box.addEventListener("pointerup", () => { held = false; });
+    box.addEventListener("pointercancel", () => { held = false; });
+    box.addEventListener("keydown", e => {
+      const now = parseFloat(box.style.getPropertyValue("--at"));
+      if (e.key === "ArrowLeft"){ e.preventDefault(); set(now - 5); }
+      if (e.key === "ArrowRight"){ e.preventDefault(); set(now + 5); }
+    });
+    set(PAGE.startAt);
+    return box;
+  }
+
+  const spelling = document.getElementById("spelling");
+  PAGE.spelling.forEach(item => {
+    const l = textNode("div", item.letter);
+    l.className = "letter";
+    word.appendChild(l);
+    spelling.appendChild(makeSlider(item, l));
+  });
+  const closing = document.getElementById("closing");
+  PAGE.closing.forEach(item => closing.appendChild(makeSlider(item, null)));
+  const all = PAGE.spelling.concat(PAGE.closing);
+  document.getElementById("credits").textContent =
+    "Paintings: " + all.map(i => i.beforeArt + "; " + i.afterArt).join("; ");
+})();
+</script>
+</body>
+</html>

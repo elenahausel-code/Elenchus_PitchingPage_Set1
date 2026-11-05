@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picasso and Strategic Leadership</title>
+<style>
+/* Layout: one continuous sentence, broken by the video, finished by the learner.
+   Palette and type match the FrED Trek activities. */
+:root{
+  --lac-leman:#005DC4;
+  --lac-leman-dark:#004a9e;
+  --lac-leman-tint:#e8f1fc;
+  --ink:#12233B;
+  --ink-soft:#4a5c74;
+  --paper:#ffffff;
+  --canvas:#f3f7fc;
+  --line:#d3dfec;
+  --ok:#0E6347;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(0,32,80,.10), 0 6px 18px rgba(0,32,80,.07);
+  --font:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--canvas);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  max-width:860px;
+  margin:0 auto;
+  padding-block:28px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:grid;
+  gap:24px;
+}
+.wrap > *{min-width:0}
+
+/* ---------- the sentence, both halves ---------- */
+.line{
+  margin:0;
+  font-size:clamp(1.5rem, 1.15rem + 1.5vw, 2.1rem);
+  font-weight:600;
+  line-height:1.3;
+  letter-spacing:-.005em;
+}
+h1.line{text-wrap:balance}
+.sentence{line-height:2.1}
+
+/* ---------- video ---------- */
+.video{display:grid;gap:6px}
+.frame{
+  position:relative;
+  justify-self:center;
+  width:100%;
+  max-width:560px;
+  aspect-ratio:892/834;
+  background:#0b1524;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.video a{font-size:.85rem;color:var(--ink-soft);justify-self:end}
+.video a:hover{color:var(--lac-leman)}
+
+/* ---------- drop spaces ---------- */
+.slot{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  vertical-align:middle;
+  min-width:8.5em;
+  max-width:100%;
+  min-height:2.1em;
+  margin:.1em .05em;
+  padding:0 .4em;
+  border:2px dashed #8fb3dd;
+  border-radius:8px;
+  background:#fafcfe;
+  color:var(--ink-soft);
+  font-size:.82em;
+  font-weight:400;
+  line-height:1.2;
+}
+.slot.filled{min-width:0;border-color:transparent;background:transparent;padding:0}
+.slot.nudge{animation:nudge .4s ease}
+
+/* ---------- option cards ---------- */
+.tie{display:flex;align-items:center;min-height:48px}
+.tie.left{margin-left:calc(var(--pad) * -1)}
+.tie.right{margin-right:calc(var(--pad) * -1);justify-content:flex-end}
+.rope{flex:0 0 calc(var(--pad) + 16px);height:2px;background:#9db4cd}
+.tie.left .rope{margin-right:6px}
+.tie.right .rope{margin-left:6px}
+.tie .card::before{content:"";position:absolute;top:8px;bottom:8px;width:2px;background:#9db4cd}
+.tie.left .card::before{left:-7px}
+.tie.right .card::before{right:-7px}
+.card{
+  font:inherit;
+  color:var(--ink);
+  text-align:left;
+  display:flex;
+  align-items:center;
+  flex:0 1 240px;
+  min-width:0;
+  min-height:48px;
+  padding:10px 14px;
+  border:1px solid #9db4cd;
+  background:var(--paper);
+  cursor:grab;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+  position:relative;
+}
+.card:hover,.card:focus-visible{border-color:var(--lac-leman);background:var(--lac-leman-tint)}
+.card:focus-visible{outline:3px solid #7fb2ee;outline-offset:2px}
+.card.pulled{z-index:60;cursor:grabbing}
+.pull{position:fixed;inset:0;width:100%;height:100%;z-index:50;pointer-events:none}
+.pull polyline{fill:none;stroke:#9db4cd;stroke-width:1.6}
+.slot .card{
+  width:auto;
+  min-height:0;
+  padding:.1em .55em;
+  font-weight:600;
+  line-height:1.25;
+  border:1px solid var(--line);
+  border-left:4px solid var(--lac-leman);
+  border-radius:8px;
+  background:var(--lac-leman-tint);
+}
+.card.locked{cursor:default;touch-action:auto}
+.slot .card.locked{
+  padding-right:1.7em;
+  border-color:#a9cdbd;
+  border-left-color:var(--ok);
+  background:#eef7f3;
+}
+.card.locked::after{
+  content:"";
+  position:absolute;top:50%;right:.55em;margin-top:-.32em;
+  width:.65em;height:.38em;
+  border-left:2px solid var(--ok);
+  border-bottom:2px solid var(--ok);
+  transform:rotate(-45deg);
+}
+@keyframes nudge{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  75%{transform:translateX(5px)}
+}
+
+/* ---------- option zone ---------- */
+.bank{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  --pad:20px;
+  padding:18px var(--pad);
+  border-left:6px solid var(--lac-leman);
+  border-right:6px solid var(--lac-leman);
+  display:grid;
+  gap:14px;
+}
+.bank h2{margin:0;font-size:1rem;font-weight:600}
+.groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.group{min-width:0;display:grid;gap:8px;align-content:start}
+.group h3{margin:0;font-size:.85rem;font-weight:600;color:var(--ink-soft)}
+.group:last-child h3{text-align:right}
+.list{display:grid;gap:8px;align-content:start}
+
+/* ---------- controls and feedback ---------- */
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.btn{
+  font:inherit;
+  border-radius:8px;
+  border:1px solid transparent;
+  padding:10px 18px;
+  cursor:pointer;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.btn:focus-visible{outline:3px solid #7fb2ee;outline-offset:2px}
+.btn-primary{background:var(--lac-leman);color:#fff}
+.btn-primary:hover{background:var(--lac-leman-dark)}
+.btn-primary[disabled]{background:#9fb6cf;cursor:not-allowed}
+.next{justify-self:end;text-decoration:none}
+.btn-ghost{background:var(--paper);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--lac-leman);color:var(--lac-leman)}
+.feedback{border-radius:8px;font-size:.95rem}
+.feedback.show{padding:12px 16px;border:1px solid var(--line);background:var(--paper)}
+.feedback.good{border-color:#a9cdbd;background:#eef7f3;color:#0b4d38}
+.feedback.mixed{border-color:#f0c19f;background:#fdf3ec;color:#8a3d13}
+
+@media (max-width:640px){
+  .wrap{padding-block:18px 40px;gap:20px}
+  .groups{grid-template-columns:minmax(0,1fr)}
+  .bank{--pad:14px;padding-block:14px}
+  .sentence{line-height:1.9}
+}
+@media (prefers-reduced-motion:reduce){
+  .slot.nudge{animation:none}
+  .btn{transition:none}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <h1 class="line">Just as Picasso distills a complex subject into a few clear lines,</h1>
+
+  <section class="video" aria-label="Picasso drawing video">
+    <div class="frame"><video src="picasso.mp4" autoplay muted loop playsinline aria-label="Picasso drawing, playing on repeat without sound"></video></div>
+  </section>
+
+  <p class="line sentence" id="sentence">
+    strategic leaders should
+    <span class="slot" id="slot1" data-slot="1" aria-label="Space 1, empty">Space 1</span>
+    complexity and cascade a
+    <span class="slot" id="slot2" data-slot="2" aria-label="Space 2, empty">Space 2</span>
+    message throughout the organization.
+  </p>
+
+  <section class="bank" aria-label="Options">
+    <h2>Pull an option by its rope into its space in the sentence. The right option stays in place. A wrong option bounces back.</h2>
+    <div class="groups">
+      <div class="group">
+        <h3>Options for space 1</h3>
+        <div class="list" id="list1" data-list="1"></div>
+      </div>
+      <div class="group">
+        <h3>Options for space 2</h3>
+        <div class="list" id="list2" data-list="2"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <button class="btn btn-ghost" id="resetBtn" type="button">Start new</button>
+  </div>
+  <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+
+  <a class="btn btn-primary next" id="nextLink" href="page2.html">Go to page 2</a>
+
+</main>
+
+<script>
+/* ================================================================
+   CONFIGURATION: everything editable lives in this block.
+   ================================================================ */
+const CONFIG = {
+  /* correct: true marks the right answer for that space. */
+  options: {
+    1: [
+      { id: "increase", text: "increase" },
+      { id: "absorb",   text: "absorb", correct: true },
+      { id: "delegate", text: "delegate" },
+      { id: "eradicate", text: "eradicate" }
+    ],
+    2: [
+      { id: "rigid", text: "rigid" },
+      { id: "complicated", text: "overcomplicated" },
+      { id: "clear",       text: "clear and manageable", correct: true },
+      { id: "pleasant",    text: "stakeholder-pleasing" }
+    ]
+  },
+
+  messages: {
+    wrong:    "That option doesn't fit here, so it bounced back. Watch the drawing again and try another one.",
+    allRight:   "That's right. Strategic leaders absorb complexity and cascade a clear and manageable message throughout the organization."
+  }
+};
+
+/* ================================================================
+   ACTIVITY
+   ================================================================ */
+const $ = id => document.getElementById(id);
+const slots = { 1: $("slot1"), 2: $("slot2") };
+const lists = { 1: $("list1"), 2: $("list2") };
+const feedback = $("feedback"), bank = document.querySelector(".bank"), sentence = $("sentence");
+const SVG = "http://www.w3.org/2000/svg";
+const STILL = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let suppressClick = false, busy = false;
+
+/* the rope that stretches while an option is being pulled */
+const pull = document.createElementNS(SVG, "svg");
+pull.setAttribute("class", "pull");
+pull.setAttribute("aria-hidden", "true");
+pull.style.display = "none";
+const pullLine = document.createElementNS(SVG, "polyline");
+pull.appendChild(pullLine);
+document.body.appendChild(pull);
+
+function say(text, kind){
+  feedback.textContent = text || "";
+  feedback.className = "feedback" + (text ? " show" : "") + (kind ? " " + kind : "");
+}
+function emptySlot(n){
+  const s = slots[n];
+  s.textContent = "Space " + n;
+  s.classList.remove("filled");
+  s.setAttribute("aria-label", "Space " + n + ", empty");
+}
+function nudge(slot){
+  slot.classList.remove("nudge");
+  void slot.offsetWidth;
+  slot.classList.add("nudge");
+}
+function fits(card, slot){
+  return !!card.dataset.correct && card.dataset.space === slot.dataset.slot;
+}
+function freeSlots(){
+  return Object.values(slots).filter(s => !s.classList.contains("filled"));
+}
+/* the nearest open space, when the pointer is on or near the sentence */
+function nearest(x, y){
+  const r = sentence.getBoundingClientRect(), m = 30;
+  if (x < r.left - m || x > r.right + m || y < r.top - m || y > r.bottom + m) return null;
+  let best = null, dist = Infinity;
+  freeSlots().forEach(s => {
+    const b = s.getBoundingClientRect();
+    const d = Math.hypot(Math.max(b.left - x, 0, x - b.right), Math.max(b.top - y, 0, y - b.bottom));
+    if (d < dist){ dist = d; best = s; }
+  });
+  return best;
+}
+/* ropes tie space 1 options to the left wall and space 2 options to the right wall */
+function drawRope(card){
+  const w = bank.getBoundingClientRect(), t = card.tie.getBoundingClientRect(), c = card.getBoundingClientRect();
+  const left = card.dataset.space === "1";
+  const ax = left ? w.left + 6 : w.right - 6;
+  const ex = left ? c.left - 7 : c.right + 7;
+  pullLine.setAttribute("points", ax + "," + (t.top + t.height / 2) + " " + ex + "," + (c.top + c.height / 2));
+}
+function setPulled(card, on){
+  card.classList.toggle("pulled", on);
+  card.rope.style.visibility = on ? "hidden" : "";
+  pull.style.display = on ? "" : "none";
+  if (!on) pullLine.removeAttribute("points");
+}
+function moveTo(card, x, y){
+  card.style.transform = "translate(" + x + "px," + y + "px)";
+  drawRope(card);
+}
+function rest(card){
+  card.style.transform = "";
+  setPulled(card, false);
+  busy = false;
+}
+/* a wrong option springs back on its rope */
+function bounce(card, x, y){
+  if (STILL){ rest(card); return; }
+  busy = true;
+  const t0 = performance.now();
+  function step(now){
+    const t = (now - t0) / 1000;
+    if (t > 1.1){ rest(card); return; }
+    const k = Math.exp(-4.5 * t) * Math.cos(13 * t);
+    moveTo(card, x * k, y * k);
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+/* a right option stays: the rope lets go and it sits in the sentence */
+function settle(card, slot){
+  card.style.transform = "";
+  setPulled(card, false);
+  card.rope.style.visibility = "hidden";
+  slot.textContent = "";
+  slot.appendChild(card);
+  slot.classList.add("filled");
+  slot.setAttribute("aria-label", "Space " + slot.dataset.slot + ", " + card.textContent);
+  card.classList.add("locked");
+  card.tabIndex = -1;
+  busy = false;
+  if (freeSlots().length === 0) say(CONFIG.messages.allRight, "good");
+  else say("");
+}
+function drop(card, slot, x, y){
+  if (fits(card, slot)){ settle(card, slot); return; }
+  nudge(slot);
+  say(CONFIG.messages.wrong, "mixed");
+  bounce(card, x, y);
+}
+function startPointer(e, card){
+  if (busy || card.classList.contains("locked") || e.button > 0) return;
+  const sx = e.clientX, sy = e.clientY, sy0 = window.scrollY;
+  let moved = false, lastX = sx, lastY = sy, frame = 0;
+  suppressClick = false;
+  try { card.setPointerCapture(e.pointerId); } catch (err) {}
+  function place(){
+    moveTo(card, lastX - sx, lastY - sy + window.scrollY - sy0);
+  }
+  function scroll(){
+    if (lastY < 70) window.scrollBy(0, -12);
+    else if (lastY > window.innerHeight - 70) window.scrollBy(0, 12);
+    place();
+    frame = requestAnimationFrame(scroll);
+  }
+  function move(ev){
+    lastX = ev.clientX; lastY = ev.clientY;
+    if (!moved){
+      if (Math.hypot(lastX - sx, lastY - sy) < 6) return;
+      moved = true;
+      suppressClick = true;
+      setPulled(card, true);
+      frame = requestAnimationFrame(scroll);
+    }
+    place();
+  }
+  function up(ev){
+    card.removeEventListener("pointermove", move);
+    card.removeEventListener("pointerup", up);
+    card.removeEventListener("pointercancel", up);
+    if (!moved) return;
+    cancelAnimationFrame(frame);
+    const x = lastX - sx, y = lastY - sy + window.scrollY - sy0;
+    const t = ev.type === "pointerup" ? nearest(lastX, lastY) : null;
+    if (t) drop(card, t, x, y);
+    else bounce(card, x, y);
+  }
+  card.addEventListener("pointermove", move);
+  card.addEventListener("pointerup", up);
+  card.addEventListener("pointercancel", up);
+}
+/* click, tap, or keyboard: the option travels to its space on its own */
+function travel(card){
+  if (busy) return;
+  const slot = slots[card.dataset.space];
+  if (slot.classList.contains("filled")){ say(CONFIG.messages.wrong, "mixed"); return; }
+  const a = card.getBoundingClientRect(), b = slot.getBoundingClientRect();
+  const x = (b.left + b.width / 2) - (a.left + a.width / 2);
+  const y = (b.top + b.height / 2) - (a.top + a.height / 2);
+  if (STILL){
+    if (fits(card, slot)) settle(card, slot);
+    else say(CONFIG.messages.wrong, "mixed");
+    return;
+  }
+  busy = true;
+  setPulled(card, true);
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min((now - t0) / 350, 1);
+    const e = 1 - Math.pow(1 - t, 3);
+    moveTo(card, x * e, y * e);
+    if (t < 1) requestAnimationFrame(step);
+    else drop(card, slot, x, y);
+  }
+  requestAnimationFrame(step);
+}
+function makeCard(option, space){
+  const tie = document.createElement("div");
+  tie.className = "tie " + (space === "1" ? "left" : "right");
+  const rope = document.createElement("span");
+  rope.className = "rope";
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className = "card";
+  card.id = "opt-" + option.id;
+  card.textContent = option.text;
+  card.dataset.space = space;
+  if (option.correct) card.dataset.correct = "1";
+  card.tie = tie;
+  card.rope = rope;
+  card.addEventListener("click", () => {
+    if (suppressClick){ suppressClick = false; return; }
+    if (!card.classList.contains("locked")) travel(card);
+  });
+  card.addEventListener("pointerdown", e => startPointer(e, card));
+  if (space === "1"){ tie.appendChild(rope); tie.appendChild(card); }
+  else { tie.appendChild(card); tie.appendChild(rope); }
+  return tie;
+}
+function start(){
+  busy = false;
+  pull.style.display = "none";
+  [1, 2].forEach(n => {
+    emptySlot(n);
+    lists[n].textContent = "";
+    CONFIG.options[n].forEach(o => lists[n].appendChild(makeCard(o, String(n))));
+  });
+  say("");
+}
+
+$("resetBtn").addEventListener("click", start);
+start();
+</script>
+</body>
+</html>
